@@ -1,0 +1,17 @@
+1. AppForm: Main Screen - 809
+
+2. AppForm: Pop-up Screen - 1194
+
+3. AppForm: Mobile Screen(1500-1600) - 1515
+
+4. AppModule:20
+
+5. AppMenu:940
+
+6. For Self care -- 63
+
+7. Action_Master: 36
+
+8. Process Id for Key Management: 3
+
+9. Repository Entity Id: 139
