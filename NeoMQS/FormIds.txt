@@ -1,6 +1,6 @@
 1. AppForm: Main Screen - 830
 
-2. AppForm: Pop-up Screen - 1194
+2. AppForm: Pop-up Screen - 1197
 
 3. AppForm: Mobile Screen(1500-1600) - 1515
 
