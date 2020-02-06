@@ -1,0 +1,19 @@
+Free Period Promotion
+
+Execution Order :
+
+Step-1: FreePeriodPlan.xlsx
+
+Step-2 : FreePeriodProm.xlsx
+
+Step-3 : FreePeriodPromTransaction.xlsx (While Executing FreePeriodPromTransaction.xlsx,we should also execute Reconnect.xlsx, Renewal.xlsx & Disconnection.xlsx)
+
+a) Reconnect.xlsx
+
+b) Disconnection.xlsx
+
+c) Renewal.xlsx
+
+Step-4 : Order_Upload.xlsx (Upload related to Free Period Promotion)
+
+Step-5 : AddContract.xlsx (Api related to scattered Promotion).
