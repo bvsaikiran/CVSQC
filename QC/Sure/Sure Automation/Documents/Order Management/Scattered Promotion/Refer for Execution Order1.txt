@@ -1,0 +1,15 @@
+Execution Order :
+
+Step-1: BasicServices.xlsx
+
+Step-2: Bundle.xlsx
+
+Step-3: ScatteredPromPlan.xlsx
+
+Step-4: ScatteredProm.xlsx
+
+Step-5: ScatteredPromTransaction.xlsx
+
+Step-6: OrderUpload.xlsx  (Upload related to scattered Promotion)
+
+Step-7: AddContract.xlsx (Api related to scattered Promotion).
