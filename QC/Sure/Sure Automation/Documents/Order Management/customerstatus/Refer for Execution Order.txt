@@ -1,0 +1,13 @@
+Customer Status
+
+Execution Order :
+
+Step-1 : CustomerStatusPlans.xlsx   
+
+Step-2 : CustomerStatusPromPlan.xlsx
+
+Step-3 : CustomerStatusTransaction.xlsx (While executing CustomerStatusTransaction.xlsx, we should also execute Disconnection.xlsx & Reconnection.xlsx)
+
+a) Disconnection.xlsx
+
+b) Reconnection.xlsx
