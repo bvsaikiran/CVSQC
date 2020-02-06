@@ -1,0 +1,10 @@
+Cross Product Promotion
+
+Execution Order :
+
+Step-1 : CrossProductPromPlan.xlsx
+
+Step-2 : CrossProductProm.xlsx
+
+
+
