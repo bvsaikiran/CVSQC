@@ -1,0 +1,427 @@
+﻿<?xml version="1.0" ?>
+<Queries>
+  <Module Name="System">
+    <Q-10001 Name="CustomerDetails" Text="select CUSTOMER_ID,CUSTOMER_NBR,CUSTOMER_TYPE,CATEGORY,NOTES,BILL_TO_ID,OPENTITY_TYPE,OPENTITY_ID,PARTY_TYPE,TITLE,FIRST_NAME,MIDDLE_NAME,LAST_NAME,COMPANY_NAME,CONTACT_NAME,HOME_PHONE,WORK_PHONE,MOBILE_PHONE,FAX_NBR,EMAIL,ALT_EMAIL,CURRENCY_CODE,TIME_ZONE,BILLING_MEDIA,GROUP_ID,STATUS,BILL_TO_PARENT,PARENT,NATIONALITY,UIN_TYPE,UIN,RMN_VERIFIED,ISGSTREGISTERED,GSTIN,ISGSTVERIFIED,IS_MULTIROOM,pa.CITY_CODE,pa.STREET from customer_vw c, Party_address pa where c.CUSTOMER_ID = pa.party_id and pa.ADDRESSTYPE_CODE='PRI' and c.CUSTOMER_NBR=:P_CustomerNbr" />
+    <Q-10002 Name="AutoGenerationSequence" Text="select seqAutoDocumentNum.nextval seqval from dual" />
+    <Q-10003 Name="AutoGenerationSequence" Text="select location_code,location_descr from inventory_location" />
+    <Q-10004 Name="UserLoations" Text="select b.location_code,b.location_descr from user_inventory_location a, inventory_location b   where a.location_code = b.location_code and user_id=:P_Userid and deleted='N'" />
+    <Q-10005 Name="UserDateFormat" Text="SELECT nvl(pu.user_option_value,nvl(app.current_value,app.default_Value)) currentvalue  FROM profile_option_user_value pu,  app_profile_option app WHERE pu.option_id(+)=app.option_id and app.option_name ='DATEFORMAT' and user_id(+) =:P_UserID"/>
+    <Q-10006 Name="TestCaseRelations" Text="SELECT b.Parent_testcase_id,b.child_testcase_id, a.internal_id childinternalid FROM testcase_file_details a, testcase_relation b WHERE a.testcase_external_id = b.child_testcase_id"/>
+    <Q-10007 Name="GetLatestVoucherID" Text="select voucher_number from mtl_rtn_voucher where voucher_id = (select max(voucher_id) from  mtl_rtn_voucher where created_by=:P_Userid and approval_status='A')"/>
+    <Q-10008 Name="GetLatestVoucherItem" Text="select voucher_number from mtl_rtn_voucher where voucher_id = (select max(voucher_id) from  mtl_rtn_voucher_item where returned_qty=received_qty)"/>
+    <Q-10009 Name="GetLocationDetails" Text="SELECT b.location_code,b.location_descr FROM entity_inventory_locations a, inventory_location b ,  operational_entity_vw c WHERE c.ENTITY_ID  =a.entity_id AND a.location_code=b.location_code AND c.ENTITY_NAME=:P_entityName "/>
+    <Q-10010 Name="GetUploadJobDetails" Text="SELECT   g.group_id,g.name,g.group_desc,a.api_id,api_name,component_type,component_name,header_dump_tablename,detail_dump_tablename,format_type_id FROM int_import_format f,int_api a,int_api_component c,sc_m_job_group g,sc_m_job j WHERE a.api_id=f.api_id AND a.api_id  =c.api_id and g.start_job_id=j.job_id and type_id=3 and upper(j.process)=upper(f.fmt_name)"/>
+    <Q-10100 Name="GetUploadGroupDetails" Text="select b.group_id, a.* from automation_upload_details a,sc_m_job_group b where upper(a.group_name)=upper(b.name)"/>
+    <Q-10011 Name="GetCustomerUploadedData" Text="SELECT NULL customer_nbr,cust.title,cust.first_name,cust.middle_name,cust.last_name,cust.customer_type,OPE.ENTITY_CODE,OPE.CURRENCY_CODE,CUST.CUSTOMER_TYPE,CUST.NOTES,CUST.COMPANY_NAME,CUST.PARTY_TYPE,CUST.BILLING_MEDIA,(select ELEMENT_CODE from network_element where ELEMENT_ID=custnet.ENDPOINT_ELEMENT_ID) Network_Element_Code,CUSTNET.PORT_ID,CUST.NATIONALITY,CUST.UIN_TYPE,CUST.UIN,CUST.PARENT,CUST.BILL_TO_PARENT,CUST.GROUP_ID,CUST.ISGSTREGISTERED,CUST.GSTIN,CUST.ISGSTVERIFIED,CUST.IS_MULTIROOM,CUST.MOBILE_PHONE,CUST.CAF_STATUS,CUST.DATE_OF_BIRTH,CUST.GENDER,CUST.CAF_SUBMISSIONDATE FROM customer_vw cust,OPERATIONAL_ENTITY_VW ope,CUSTOMER_NETWORK_ENDPOINT custnet WHERE customer_nbr = :p_document_num AND CUST.OPENTITY_ID=OPE.ENTITY_ID and CUSTNET.CUSTOMER_ID(+)=CUST.CUSTOMER_ID"/>
+    <Q-10012 Name="GetCustomerContractDetails" Text="SELECT CUST.CONTACT_NAME,CUST.EMAIL,CUST.HOME_PHONE,CUST.WORK_PHONE,CUST.MOBILE_PHONE FROM customer_vw cust WHERE customer_nbr=:p_document_num"/>
+    <Q-10013 Name="GetCustomerAddressDetails" Text="PA.ADDRESSTYPE_CODE,PA.ADDRLINE1,PA.ADDRLINE2,PA.STREET,PA.AREA,PA.CITY,PA.DISTRICT,PA.STATE,PA.ZIPCODE,PA.COUNTRY,PA.LOCATION from customer_vw cust,OPERATIONAL_ENTITY_VW ope,PARTY_ADDRESS pa where customer_nbr=:p_document_num and CUST.CUSTOMER_ID=PA.PARTY_ID"/>
+    <Q-10014 Name="GetCustomerOtherDetails" Text="select ATTRIBUTE1,ATTRIBUTE2,ATTRIBUTE3,ATTRIBUTE4,ATTRIBUTE5,ATTRIBUTE6,ATTRIBUTE7,ATTRIBUTE8 from FLEX_TABLE_ATTR_VALUE where FLEX_TABLE_CODE='FRM120' and KEY_ID=:p_document_num"/>
+    <Q-10016 Name="GetMRNHeaderDetails" Text="select null mrn_number,mrn_date,Po_number,PO_date,supplier_code,location_code,mrn.notes from mtl_receipt_note mrn,supplier_tbl sp where mrn.supplier_id=sp.supplier_id and mrn_number=:p_document_num"/>
+    <Q-10017 Name="GetMRNDetailCount" Text="select item_code,count(0) from item_master im, mtl_receiptnote_item_dtl mrid , mtl_receipt_note mrn where im.item_id=mrid.item_id and mrn.mrn_id=mrid.mrn_id and MRN_NUMBER= :p_document_num group by item_code"/>
+<Q-10018 Name="GetProjectDetails" Text="select ap.project_name,pr.testlink_plan_name from execution_Plan_Config pc,automation_projects ap, execution_Plan_projects pr where pc.ex_plan_id=pr.ex_plan_id and pr.project_id=ap.project_id and pr.STATUS='A' and pc.ex_Plan_Name=:P_executionName order by upper(ap.project_name)"/>    
+<Q-10019 Name="GetExInstanceID" Text="select execution_instances_SEQ.nextval from dual"/>
+    <Q-10020 Name="GetExInstanceID" Text="select ex_instance_testcases_SEQ.nextval from dual"/>
+    <Q-10021 Name="GetInstanceIDTestCases" Text="select eit.testcase_External_id,eit.start_time,eit.end_time,eit.status,tfd.testcase_name,eit.notes from execution_instance_testcases eit,TESTCASE_FILE_DETAILS tfd where eit.testcase_external_id=tfd.TESTCASE_EXTERNAL_ID and eit.ex_instance_id=:P_instance_id"/>
+    <Q-10022 Name="GetJobParameters" Text="SELECT Sc_1.PARAM_ID, Sc_1.NAME, Sc_1.PARAM_TYPE, Sc_1.SET_OF_VALUES, Sc_1.PARAM_VALUE_SET, Sc_1.CREATED_BY,Sc_1.CREATED_ON, Sc_1.MODIFIED_BY, Sc_1.MODIFIED_ON, Sc_1.PARAM_CODE, Sc_1.DISPLAY_NAME AS DISPLAY_NAME,Sc_2.DISPLAY_NAME AS JOB_PARAM_DISPLAY_NAME, Sc_2.JOB_PARAM_ID,Sc_2.JOB_ID, Sc_2.MANDATORY, Sc_2.FILTER_COL, Sc_2.REFERRED_COL,Sc_2.VALUELIST_ID, Sc_2.PARAM_ORDER,Sc_2.VALUELIST_ARGS, Sc_2.DEFAULT_VALUE, Sc_2.IS_RECEPIENT, Sc_3.DATATYPE_ID, Sc_3.DATATYPE_NAME,Sc_6.JOB_GROUP_ID,Sc_1.IS_USERID_REQUIRED FROM SC_M_PARAMETER Sc_1,SC_M_JOB_PARAMETERS Sc_2, SC_DATATYPE Sc_3,SC_M_JOB_GROUP Sc_4, sc_job_group_Mapping sc_6 WHERE sc_2.job_id=sc_6.JOB_ID and sc_6.group_id=sc_4.group_id AND Sc_1.PARAM_ID = Sc_2.PARM_ID AND Sc_1.PARAM_TYPE = Sc_3.DATATYPE_ID ORDER BY PARAM_ORDER ASC"/>
+    <Q-10023 Name="GetJobDetails" Text="select jgm.job_group_id, jg.group_id,jg.name as group_name,group_desc,jgm.job_id,j.job_desc,j.name as Job_name,jgm.job_order,jt.name as job_type,jt.description as job_type_desc from sc_m_job_group jg,sc_job_group_mapping jgm ,sc_m_job j,sc_m_job_type jt where jg.group_id=jgm.group_id and jgm.job_id=j.job_id and j.type_id=jt.job_type_id order by jg.group_id,jgm.job_order"/>
+    <Q-10024 Name="GetJobDetails" Text="select item_code from  item_master  where item_id not in ( select item_id from supplier_item)"/>
+    <Q-10025 Name="GetJobDetails" Text=" select serial_number from item_serial_dtl where  item_id in (  select item_id from item_master where status='A' and item_code='DEC')  and current_locatioN='HLOC' and quality_status='GOOD' and inventory_status='AVL' ORDER BY item_detail_id DESC"/>
+    <Q-10026 Name="GetJobDetails" Text="select prov_attribute from item_serial_dtl where  item_id in (  select item_id from item_master where status='A' and item_code='DEC')  and current_locatioN='HLOC' and quality_status='GOOD' and inventory_status='AVL' ORDER BY item_detail_id DESC"/>
+    <Q-10028 Name="GetJobDetails" Text="select LOCATION_CODE from INVENTORY_LOCATION where active='N'"/>
+    <Q-10029 Name="GetTestSuitDetails" Text="select project_name,SUIT_NAME,SUIT_TESTLINK_ID from AUTOMATION_PROJECTS proj,AUTOMATION_PROJECTS_TEST_SUIT suit where proj.project_id=suit.project_id and suit.status='A'"/>
+	<Q-10030 Name="GetVariablesDetails" Text="select upper(variable_name) variablename,default_value,current_value,plan_id from static_variables sv, plan_variable_values pv where sv.variable_id=pv.variable_id(+)"/>  
+  </Module>
+  <Module Name="Billing">
+<Q-11001 Name="CustrNumbrBillNotGenerated" Text="select party_nbr from party where party_id in (select customer_id from contract where status = 'A') and party_id not in (select party_id from invoice) and is_multiroom = 'N' order by party_id desc"/>
+<Q-11002 Name="ContractNumbrForCustrBillNotGenerated" Text="select contract_number from contract where customer_id in(select party_id from party where party_id in (select customer_id from contract where status = 'A') and is_multiroom = 'N') and customer_id not in (select party_id from invoice) order by customer_id desc"/>
+<Q-11003 Name="CustrNumForBillNotGeneratedWithsinglecontract" Text="Select Customer_Nbr From Customer_Tbl Where Customer_Id in (Select Party_Id From Contract_Priceline Where Billed_Until Is Null And Party_Id Not In (Select Party_Id From Invoice) and party_id not in (select party_id from pro_invoice)) order by customer_id desc"/>
+<Q-11004 Name="CustrNumForBillNotGeneratedWithMultiplecontracts" Text="select a.customer_nbr from customer_tbl a , (select customer_id from contract where status = 'A' and is_prepaid_contract = 'N' and customer_id not in (select party_id from invoice) group by customer_id having count(1)=3 order by customer_id desc) bwhere a.customer_id = b.customer_id order by a.customer_id desc"/>
+<Q-11005 Name="CustomerwhoseBillIsgenerated" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from invoice where status='O') and is_trueprepaid='N'order by customer_id desc"/>
+<Q-11006 Name="CustomerwithcanceledBill" Text="select customer_nbr from customer_tbl where customer_id in(select party_id from invoice where status='D')order by customer_id desc"/>
+<Q-11007 Name="cancelledbbillnumber" Text="select invoice_nbr from invoice  where status='D' order by party_id desc"/>
+<Q-11008 Name="BillNbrforcustomerhavingcreditnote" Text="select invoice_nbr from invoice where invoice_id in (select invoice_id from Credit_Debit_Note_Items where charge_id != 0) order by 1 desc"/>
+<Q-11009 Name="proformabilledCustrnbr" Text="select customer_nbr from customer_tbl where customer_id in(select party_id from pro_invoice) order by customer_id desc"/>
+<Q-11010 Name="Customerreteivedhavingbasicplan" Text="select c.customer_nbr from (SELECT contract_id,party_id from contract_priceline GROUP BY contract_id, party_id having count(party_id)=1 order by contract_id desc) a,(select party_id from contract_priceline where billed_until is null and plan_id in (select plan_id from priceplan where plan_desc = 'PLAN1SERV1') order by contract_id) b , customer_tbl c where a.party_id = b.party_id and a.party_id = c.customer_id and b.party_id = c.customer_id order by c.customer_id desc"/>
+<Q-11011 Name="Customerreteivedhavingproformabill" Text="select customer_nbr from customer_tbl a, (select party_id from pro_invoice order by party_id desc) b where a.customer_id  = b.party_id order by a.customer_id desc"/>
+<Q-11012 Name="CustomerreteivedhavingonetimesaleorderBill" Text=" select customer_nbr from customer_tbl where customer_id in (select party_id from merc_sale_order where party_id  in (select party_id from invoice )) order by customer_id desc"/>
+<Q-11013 Name="Customerreteivedhavingonetimesaleorder" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from merc_sale_order where party_id not in (select party_id from invoice )) order by customer_id desc"/>
+<Q-11014 Name="CustomerreteivedhavingBill" Text="select customer_nbr from customer_tbl a, (select party_id from invoice order by party_id desc) b where a.customer_id = b.party_id order by a.customer_id desc"/>
+</Module>
+  <Module Name="Customer Care">
+<Q-12001 Name="GetcustomerNumber" Text="select customer_nbr from customer_tbl order by customer_id desc"/>
+<Q-12002 Name="GetServiceRequestNumber" Text="select srv_req_number from service_request  where response_status !='RESOLVED'and nature =:nature and srv_req_category ='BILL' order by reported_by desc"/>
+<Q-12003 Name="GetServiceRequestCategory" Text="select srv_req_category from service_request_vw where nature =:nature and response_status='ACTIVE' order by srv_req_category"/>
+<Q-12004 Name="GetServiceRequestNature" Text="select nature from service_request_vw where srv_req_category =:category and response_status='ACTIVE' order by nature"/>
+<Q-12005 Name="RetrieveServiceRequestNumber" Text="select srv_req_number from service_request"/>
+<Q-12006 Name="GetServiceRequestResolutionCode" Text="select srv_req_res_code from srv_req_resolution where srv_req_res_descr='Resolved successfully' and status='A'"/>
+<Q-12007 Name="GetClosedServiceRequestNumber" Text="select srv_req_number from service_request where response_status='RESOLVED' order by reported_by desc"/>
+<Q-12008 Name="GetInactiveResolutionCode" Text="select srv_req_res_code from srv_req_resolution where status='I'"/>
+<Q-12009 Name="GetCurrencyCode" Text="select currency_code from currency where currency_code='RS'"/>
+<Q-12010 Name="GetEntityTypeBU" Text="select entity_type from operational_entity_type where entitytype_name='Business Unit'"/>
+<Q-12011 Name="GetEntityTypeBA" Text="select entity_type from operational_entity_type where entitytype_name='Business Associates'"/>
+<Q-12012 Name="GetWorkorderNumber" Text="select workorder_number from workorder where ref_doc_type='SRVREQ'and workorder_status='ACTIVE' order by workorder_id desc"/>
+<Q-12013 Name="GetRef_doc_idNumber" Text="select ref_doc_id from workorder where ref_doc_type='SRVREQ'and workorder_status='ACTIVE' order by workorder_id desc"/>
+<Q-12014 Name="GetworkorderResolutionCode" Text="select resolution_code from workorder where resolution_notes='Problem Solved'"/>
+<Q-12015 Name="GetClosedworkordernum" Text="select workorder_number from workorder where workorder_status='RESOLVED'and ref_doc_type='SRVREQ' order by created_by"/>
+<Q-12016 Name="GetOpeEntityHO" Text="select entity_code from operational_entity_tbl where entity_type='HO' and parent_entity_id='0' and entity_id='14'"/>
+<Q-12017 Name="GetOpeEntityBU" Text="select entity_code from operational_entity_tbl where entity_type='BU'and parent_entity_id='14' and entity_id='678'"/>
+<Q-12018 Name="GetActiveTeam" Text="select team_code from team  where team_id='92' and status='1'"/>
+<Q-12019 Name="GetActiveEmployee" Text="select employee_code from employee where employee_id='223' and status='1'"/>
+<Q-12020 Name="GetResolvedStatus" Text="select response_code from response_status_vw where response_descr='Resolved'"/>
+<Q-12021 Name="GetComment" Text="select comment_code from srv_req_comment_rep where comment_descr='BILLCOMMENT'"/>
+<Q-12022 Name="GetProblemCode1" Text="select problem_code from problem_code_vw where status='A' and problem_id='108'"/>
+<Q-12023 Name="GetProblemCode2" Text="select problem_code from problem_code_vw where status='A' and problem_id='1'"/>
+<Q-12024 Name="GetActiveStatus" Text="select response_code from response_status_vw where response_descr='Assigned'"/>
+<Q-12025 Name="GetServReqOpenWrkOrder" Text="SELECT B.SRV_REQ_number FROM WORKORDER A , SERVICE_REQUEST B WHERE A.CUSTOMER_ID=B.REPORTED_BY AND A.REF_DOC_ID=B.SRV_REQ_ID and a.workorder_status not like 'RESOLVED' and b.response_status not like 'RESOLVED'"/>
+<Q-12026 Name="GetEmpCode" Text="select employee_code from employee_tbl where employee_id in (select employee_id from EMPLOYEE_SHIFTS)"/>
+<Q-12027 Name="GetCreditRating" Text="select rating_code from CREDIT_RATING  where created_by='-1'"/>
+<Q-12028 Name="GetBusinessDivision" Text="select business_desc from  business_division where status='A'"/>
+<Q-12029 Name="GetParententityidBU" Text="select parent_entity_id from operational_entity_tbl where entity_type='BU' order by 1 desc"/>
+<Q-12030 Name="GetParententityidBA" Text="select parent_entity_id from operational_entity_tbl where entity_type='BA' order by 1 asc"/>
+<Q-12031 Name="GetExistingEntityCode" Text="select entity_code from operational_entity_tbl where entity_type='BU' order by 1 desc"/>
+<Q-12032 Name="GetExistingServiceReqResolutionCode" Text="select srv_req_res_code from srv_req_resolution order by srv_req_res_id desc"/>
+<Q-12033 Name="GetExistingServiceReqNatureCode" Text="select nature_code from nature_vw order by 1 desc"/>
+<Q-12034 Name="GetExistingWorkOrderProbCode" Text="select problem_code from workorder_problem order by 1 desc"/>
+<Q-12035 Name="GetCustrWith ServiceRequest" Text="select customer_nbr from customer_tbl where customer_id in (select reported_by from service_request where srv_req_status='OPEN')order by customer_id desc"/>
+<Q-12036 Name="GetRefdocumentNumber" Text="SELECT SRV_REQ_NUMBER FROM SERVICE_REQUEST WHERE REPORTED_BY IN( SELECT CUSTOMER_ID FROM CUSTOMER_TBL WHERE CUSTOMER_ID IN (SELECT REPORTED_BY FROM SERVICE_REQUEST)) and srv_req_status='OPEN'
+order by REPORTED_BY desc"/>
+<Q-12037 Name="GetExistingWrkOrderProbCode" Text="select problem_code from workorder_problem order by 1 desc"/>
+<Q-12038 Name="GetExistingWrkOrderResolveCode" Text="select workorder_res_code from workorder_resolution order by 1 desc"/>
+<Q-12039 Name="GetExistingActiveWrkOrder" Text="select workorder_number from workorder where workorder_status='ACTIVE' order by workorder_id desc"/>
+<Q-12040 Name="GetExistingActiveCommentCode" Text="select comment_code from srv_req_comment_rep order by 1 desc"/>
+<Q-12041 Name="GetOpeEntityofBU" Text="select entity_name from operational_entity_vw where entity_id  in(select entity_id from operational_entity_tbl where entity_type='BU' and entity_code like 'A3%') order by 1 desc"/>
+<Q-12042 Name="GetOpeEntityofBA" Text="select entity_code from operational_entity_tbl where entity_type='BA' and entity_code like 'A3%' order by 1 desc"/>
+<Q-12043 Name="GetAppUserID" Text="select user_name from app_user where user_type='E' order by created_date desc"/>
+<Q-12044 Name="Getlatestticketnumbr" Text="select srv_req_number from service_request where srv_req_category='SERVERPROB' and nature='Arrest' order by created_date desc"/>
+<Q-12045 Name="GetCustomerWithdifferOpe" Text="select customer_nbr from customer_tbl  where opentity_id=16 order by 1 desc"/>
+<Q-12046 Name="GetTicketNumber" Text="select srv_req_number from service_request where response_status='RESOLVED' order by created_date desc"/>
+<Q-12047 Name="GetShiftscheduleteam" Text="select team_name from team where team_id in(select team_id from team_employee where EMPLOYEE_ID=454)"/>
+<Q-12048 Name="GetShiftscheduleemployee" Text="select (first_name||' '||last_name)  from employee where EMPLOYEE_ID=454"/>
+<Q-12049 Name="Getdummy" Text="select entity_code||'('||entity_name||')' from OPERATIONAL_ENTITY_VW where entity_type='BU' and entity_code like 'A1%' order by 1 desc"/>
+<Q-12050 Name="GetWorkordercomment" Text="select comment_code from Comments order by created_date desc"/>
+<Q-12051 Name="GetServiceRequestNumber1" Text="select srv_req_number from service_request  where response_status !='RESOLVED'
+order by 1 desc"/>
+<Q-12052 Name="GetServiceRequestNumber2" Text="select srv_req_number from service_request where  response_status !='RESOLVED' and srv_req_id in (select ref_doc_id from workorder) order by reported_by desc"/>
+<Q-12053 Name="GetServiceRequestNumber3" Text="select srv_req_number from service_request  where response_status !='RESOLVED'and srv_req_category ='BULKBREAK' and nature='BB'order by assigned_to desc"/>
+<Q-12054 Name="GetServiceRequestNumber4" Text="select srv_req_number from service_request  where response_status !='RESOLVED'and srv_req_category ='BULKBREAK' and nature='BB'order by 1 desc"/>
+<Q-12055 Name="GetServiceRequestNumber5" Text="select srv_req_number from service_request where srv_req_type is not null and response_status !='RESOLVED' order by 1 desc"/>
+<Q-12056 Name="GetServiceRequestNumber6" Text="select srv_req_number from service_request where srv_req_type is not null and response_status !='RESOLVED' order by assigned_to desc"/>
+<Q-12057 Name="GetServiceRequestNumber7" Text="select srv_req_number from service_request where response_status !='RESOLVED' order by res_notes desc"/>
+<Q-12058 Name="GetServiceRequestNumber8" Text="select srv_req_number from service_request where  srv_req_type is not null and response_status !='RESOLVED' order by res_notes desc"/>
+<Q-12059 Name="GetServiceRequestNumber9" Text="select srv_req_number from service_request where response_status !='RESOLVED' and priority='MEDIUM' order by assigned_to desc"/>
+<Q-12060 Name="GetServiceRequestNumber10" Text="select srv_req_number from service_request where response_status !='RESOLVED' and priority='LOW' order by assigned_to desc"/>
+<Q-12061 Name="GetServiceRequestNumber11" Text="select srv_req_number from service_request where response_status !='RESOLVED' and prefered_date is not null order by 1 desc"/>
+<Q-12062 Name="GetWorkNbr1" Text="select workorder_number from workorder where workorder_status='NEW' and ref_doc_type='SRVREQ' order by created_date desc"/>
+<Q-12063 Name="GetWorkNbr1" Text="select ref_doc_id from workorder where ref_doc_type='SRVREQ'and workorder_status='NEW' order by workorder_id desc"/>
+<Q-12064 Name="ServreqCUstomerOpe" Text="select srv_req_number from service_request where response_status !='RESOLVED' and reported_by in(select customer_nbr from customer_tbl where opentity_id in(select entity_id from operational_entity_vw where entity_name like '%0411OP1%'))"/>
+<Q-12065 Name="RetrieveUser" Text="select user_name from app_user where user_type='G' order by created_date desc"/>
+<Q-12066 Name="RetrieveCustomerwithActiveprofile" Text="select customer_nbr from customer_tbl where customer_id in(select customer_id from customer_profile where status='A')order by 1 desc"/>
+<Q-12067 Name="RetrieveCustomerwithInactiveprofile" Text="select customer_nbr from customer_tbl where customer_id in(select customer_id from customer_profile where  status='I')order by 1 desc"/>
+<Q-12068 Name="RetrieveCustomerwithopeenity" Text="select Entity_code from operational_entity_tbl where entity_id in(select max(entity_id) from operational_entity_tbl )"/>
+<Q-12069 Name="RetrieveCustomerofselfcareUser" Text="select customer_nbr from customer_tbl where customer_id in (select customer_id from customer_profile where status='A') and customer_id in(select ref_id from app_user )order by customer_id desc"/>
+<Q-12070 Name="Retrieveuseridwithcustomerhavingprofile" Text="select user_id from customer_profile where status='A' and customer_id in (Select ref_id from app_user) order by customer_id desc"/>
+<Q-12071 Name="RetrieveCustomerofselfcareUser" Text="select customer_nbr from customer_tbl where customer_id in (select customer_id from customer_profile where status='L') and customer_id in(select ref_id from app_user )order by customer_id desc"/>
+<Q-12072 Name="Retrieveuseridwithcustomerhavingprofile" Text="select user_id from customer_profile where status='L' and customer_id in (Select ref_id from app_user) order by customer_id desc"/>
+<Q-12073 Name="Retrieveuseridwithpasscode" Text="select user_id from app_user  where passcode !='NULL' order by 1 desc"/>
+<Q-12074 Name="Retrieveuserid" Text="select user_id from app_user order by user_id desc"/>
+<Q-12075 Name="Retrievecustrid" Text="select customer_id from customer_tbl order by 1 desc"/>
+<Q-12076 Name="Retrieveuserids" Text="select user_id from app_user where user_descr='SYSADMIN'"/>
+<Q-12077 Name="Retrieveuseremployee" Text="select employee_code from employee_tbl order by created_date desc"/>
+<Q-12078 Name="Retrieveticketnum" Text="select srv_req_number from service_request order by created_date desc"/>
+<Q-12079 Name="Retrieveticketid" Text="select srv_req_id from service_request where comments! ='NULL'order by created_date desc"/>
+<Q-12080 Name="Retrievetcustrnumber" Text="select customer_nbr from customer_tbl order by created_date desc"/>
+<Q-12081 Name="Retrievettrackid" Text="select track_id from  Online_payment_request order by 1 desc"/>
+<Q-12082 Name="Retrievetpaymentid" Text="select payment_id from  payment where payment_mode='OP' order by 1 desc"/>
+<Q-12083 Name="GetCardDetailsByCustomer" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from creditcard_customer  where is_deleted='N') order by customer_id desc"/>
+<Q-12084 Name="Retrievetentitycode" Text="select entity_code from operational_entity_tbl order by created_date desc"/>
+<Q-12085 Name="Retrievecustrid" Text="select customer_id from customer_tbl order by customer_id desc"/>
+<Q-12086 Name="Retrievecustridhavngservorder" Text="select customer_id from customer_tbl where customer_id in (select customer_id from service_order) order by customer_id desc"/>
+<Q-12087 Name="Retrieveorderid" Text="select order_id from service_order where customer_id in (select customer_id  from customer_tbl) order by customer_id desc"/>
+<Q-12088 Name="RetrieveDRpartyid" Text="select dr_party_id from funds_transfer_hdr order by 1 desc"/>
+<Q-12089 Name="Retrievepartyid havng trackid" Text="select party_id from  Online_payment_request order by 1 desc"/>
+<Q-12090 Name="Retrievecontrctnbrbeingrenewd" Text="select contract_number from contract where end_date is not null and is_prepaid_contract='N' order by 1 desc"/>
+<Q-12091 Name="Retrievecontrctnbrfordisconnctn" Text="select contract_number from contract where end_date is not null and is_prepaid_contract='N' and status='A' order by 1 asc"/>
+<Q-12092 Name="customer_order_id" Text="select customer_order_id from  service_order  where  status1='T' order by 1 desc"/>
+<Q-12093 Name="customeridgetinvoicepdfbyinvoice" Text="select party_id from invoice order by 1 desc"/>
+<Q-12094 Name="invoicenbrgetinvoicepdfbyinvoice" Text="select invoice_nbr from invoice order by 1 desc"/>
+<Q-12095 Name="entityid" Text="select entity_id from operational_entity_tbl where entity_code='CORP'"/>
+<Q-12096 Name="materialreplacmnetcustrnumber" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where item_id in (select item_id from item_master where item_code ='DEC') and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'MSO') order by customer_id desc"/>
+<Q-12097 Name="mtrreplcmntoldserialnbr" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code ='DEC') and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'MSO'  order by party_id desc"/>
+<Q-12098 Name="mtrreplcmntnewserialnbr" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code ='DEC') and current_location ='HLOC' and quality_status = 'GOOD' and inventory_status = 'AVL' and source_txn_type is null order by 1 desc"/>
+<Q-12099 Name="mtrissuecsutrnbr" Text="select customer_nbr from customer_tbl where opentity_id in (select entity_id from operational_entity_tbl where entity_code  ='CORP') order by customer_id desc"/>
+<Q-12100 Name="mtrissueserailnbr" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code ='DEC') and quality_status = 'GOOD'   and current_location = 'HLOC' and inventory_status = 'AVL' and ownership = 'C' and source_txn_type = 'MSO'  order by party_id desc"/>
+<Q-12101 Name="retrackcustomernbr" Text="select customer_nbr from customer_tbl where customer_id in (select party_id  from provsion_entitlement 
+where activate_Status = 'C' and disconnect_status is null and unique_id is not null and service_class = 'TVCH')order by customer_id desc"/>
+<Q-12102 Name="retrackhardwarerefnbr" Text="select unique_id from provsion_entitlement where activate_Status = 'C' and service_class = 'TVCH' and disconnect_status is null order by party_id desc"/>
+<Q-12103 Name="customeridhavingprofile" Text="select customer_id from customer_profile order by 1 desc"/>
+<Q-12104 Name="customernumberlatest" Text="select customer_nbr from customer_tbl where opentity_type='HO' order by customer_id desc"/>
+<Q-12105 Name="customernumberwitnoorders" Text=" select customer_nbr,customer_id from customer_tbl where is_trueprepaid = 'N' and customer_id NOT IN (select customer_id from service_order) order by customer_id desc"/>
+<Q-12106 Name="srvreqresolved" Text=" select srv_req_number from service_request  where response_status='RESOLVED' order by created_date desc"/>
+<Q-12107 Name="disconnectedcustomernbr" Text="select p.party_nbr from party p, service_order s, contract_priceline cp, priceplan pr where p.party_id = cp.party_id and s.contract_id = cp.contract_id and cp.plan_id = pr.plan_id and s.order_type = 'NEW' order by p.party_id desc"/>
+<Q-12108 Name="reconnctdcustomernbr" Text="select p.party_nbr from party p, service_order s, contract_priceline cp, priceplan pr where p.party_id = cp.party_id and s.contract_id = cp.contract_id and cp.plan_id = pr.plan_id and s.order_type =s 'DIS' order by p.party_id desc"/>
+<Q-12109 Name="selfcrecustomerid" Text="select user_name from app_user where user_type='C' and ref_id in (select customer_id from customer_tbl  where status!='A') order by created_date desc"/>
+<Q-12322 Name="GetFrequency" Text="select '1483-PLANSS15-1-M-80-M1-One Month-One Month' as code from dual union select '1483-PLANSS15-0--70-M1-One Month-No Contract' as code from dual"/>
+<Q-12323 Name="GetFrequencyvalid" Text="select '1484-PLANSS16-1-M-80-M1-One Month-One Month' as code from dual union select '1484-PLANSS16-3-M-90-M1-One Month-Three Months' as code from dual union select '1484-PLANSS16-0--70-M1-One Month-No Contract' as code from dual"/>
+
+<Q-12110 Name="WalletBalance" Text="select '₹ '||ABS(sum(trans_amount)) || '.000 Cr' from wallet_transactions where party_id in (select customer_id from customer_tbl where customer_nbr =:p_ram1)"/>
+<Q-12111 Name="selfcrebackdatedcustomerid" Text="select user_name from app_user where user_type='C' and ref_id in (select customer_id from customer_tbl  where status ='A')and ref_id in (select customer_id from contract where contract_period = 3 and plan_category = 'M' and end_date ='30-APR-20') order by created_date desc"/>
+<Q-12112 Name="Billamount" Text="select invoice_amount || '.000' from invoice where party_id in (select customer_id from customer_tbl where customer_nbr =:p_ram2)"/>
+
+
+
+
+
+
+</Module>
+
+<Module Name="Inventory">
+<Q-12035 Name="GetMSOCustomerNumber" Text="select a.customer_nbr from Customer_Tbl a, merc_sale_order b, Merc_Sale_Order_Line c Where A.Customer_Id=B.Party_Id And B.Order_Id=C.Order_Id And C.Item_Descr IN (SELECT Item_Descr FROM Item_Master WHERE item_code =:P_item) And C.Ord_Qty > C.Issued_Qty And B.Order_Date Between '07-FEB-18' and '14-MAY-20'order by Customer_Id desc"/>
+
+<Q-13001 Name="GetCustomerNbr" Text="select customer_nbr from customer_tbl where customer_id not in (select party_id from merc_sale_order) and opentity_id in (select entity_id from operational_entity_tbl where entity_code  =:P_IssuingEntity) order by customer_id desc"/>
+
+<Q-13002 Name="GetOldSerialNumberMSO" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =: P_item) and source_txn_type = 'MSO' and inventory_status = 'AVL' and quality_status = 'GOOD' order by party_id desc"/>
+
+<Q-13003 Name="GetSaleOrderNbr" Text="select ORDER_NUMBER from merc_sale_order order by order_id desc"/>
+
+<Q-13004 Name="GetNewSerialNumber_SetTopBox" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and current_location =:P_Location and quality_status = 'GOOD' and inventory_status = 'AVL' and source_txn_type is null order by 1 desc"/>
+
+<Q-13005 Name="GetInactiveItem" Text="select ITEM_CODE from item_master where status = 'I' order by 1 desc"/>
+
+<Q-13006 Name="GetNewSerialNumber_SetTopBox1" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item5) and current_location =:P_Location and quality_status = 'GOOD' and inventory_status = 'AVL' and source_txn_type is null order by 1 desc"/>
+
+<Q-13007 Name="GetShippedBy" Text="SELECT SHIP_SERVICE_CODE FROM Ship_Service_Vw order by Ship_Service_Code desc"/>
+
+<Q-13008 Name="GetCustomerNumber_OES" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where item_id in (select item_id from item_master where item_code =: P_item) and ownership = 'P' and source_txn_type = 'OES' and inventory_status = 'AVL' and quality_status = 'GOOD') order by customer_id desc"/>
+
+<Q-13009 Name="GetOldSerialNumber_OES" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =: P_item) and source_txn_type = 'OES' and inventory_status = 'AVL' and quality_status = 'GOOD' and ownership = 'P' order by party_id desc"/>
+
+<Q-13010 Name="GetCustomerNumber_SO" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where item_id in (select item_id from item_master where item_code =: P_item) and source_txn_type = 'SO' and inventory_status = 'AVL' and quality_status = 'GOOD') order by customer_id desc"/>
+
+<Q-13011 Name="GetOldSerialNumber_SO" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =: P_item) and source_txn_type = 'SO' and inventory_status = 'AVL' and quality_status = 'GOOD' order by party_id desc"/>
+
+<Q-13012 Name="GetSaleOrderNbr_Entity" Text="select order_number from merc_sale_order where  order_id in (select Order_id from merc_sale_order_line where item_descr in (select item_descr from item_master where item_code =:P_item) and ord_qty > issued_qty) and party_id  = '16' and order_status = 'A' order by order_id desc"/>
+
+<Q-13014 Name="GetPlanName" Text="Select PLAN_CODE From Priceplan Where Category='HWP' And Bundle_Id In (Select Bundle_Id From Bundle_Service Where Service_Id In (select service_id from Service_Attr_Value where attribute1 in (select item_id from item_master where item_code = : P_item))) order by PLAN_ID desc"/>
+
+<Q-13015 Name="GetSerialNumber_ModifyItemAttributes_Customer" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and mrn_id != 0 and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type ='MSO' order by 1 desc"/>
+
+<Q-13016 Name="GetSerialNumber_ModifyItemAttributes_Entity" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and mrn_id != 0 and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'C' and current_location =:P_Location order by 1 desc"/>
+
+<Q-13017 Name="Get_FaultySerialNumber" Text="select serial_number from item_serial_dtl where item_id  in (select item_id from item_master where item_code =:P_item) and quality_status = 'FAULTY' and inventory_status = 'AVL' and ownership = 'C' and current_location=:P_Location and source_txn_type is null order by 1 desc"/>
+
+<Q-13018 Name="Get_ScrpSerialNumber_DEC" Text="select serial_number from item_serial_dtl where item_id  IN (SELECT item_id FROM item_master WHERE item_code =:P_item) and mrn_id != 0 and quality_status = 'SCRP' and inventory_status = 'AVL' and ownership = 'C' and current_location=:P_Location and source_txn_type is null order by 1 desc"/>
+
+<Q-13019 Name="GetSCSerialNumber_ModifyItemAttributes_Customer" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code = : P_item) and mrn_id != 0 and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type='MSO' order by 1 desc"/>
+
+<Q-13020 Name="Getunderrepairing_serailnumber" Text="select serial_number from item_serial_dtl where  item_id in (select item_id from item_master where item_code =:P_item) and current_location=:P_Location and quality_status='GOOD' and inventory_status='AVL' and ref_party_id!=0 ORDER BY 1 DESC"/>
+
+<Q-13021 Name="Getserialnumber_Itemcodecorrection" Text="SELECT serial_number FROM item_serial_dtl WHERE external ='N' AND source_txn_type IS NULL AND  current_location =:P_Location AND  item_id  IN (SELECT item_id FROM item_master WHERE item_code =:P_Item) AND serial_number NOT IN(SELECT serial_number FROM inventory_txn_item_dtl)ORDER BY item_detail_id DESC"/>
+
+<Q-13022 Name="Getserialnumber_Itemcodecorrection_MSO" Text="SELECT serial_number FROM item_serial_dtl where  source_txn_type ='MSO'  AND item_id  IN (SELECT item_id FROM item_master WHERE item_code =:P_item) AND current_location =:P_Location AND serial_number IN(SELECT serial_number FROM inventory_txn_item_dtl)ORDER BY item_detail_id DESC"/>
+
+<Q-13023 Name="Getserialnumber_Inactive_Entity" Text="select entity_code from operational_entity_tbl where status='I' order by 1 desc"/>
+
+<Q-13024 Name="Getserialnumber_RREQ_DEC" Text="select serial_number from item_serial_dtl where current_location=:P_Location and ref_repair_id!=0 and item_id IN (SELECT item_id FROM item_master WHERE item_code =:P_item) and quality_status = 'FAULTY' and inventory_status='AVL' order by item_detail_id desc"/>
+
+<Q-13025 Name="Getserialnumber_RREC_DEC" Text="select serial_number from item_serial_dtl where current_location=:P_Location and ref_repair_id!=0 and item_id IN (SELECT item_id FROM item_master WHERE item_code =:P_item) and quality_status = 'FAULTY' and inventory_status='AVL' order by item_detail_id desc"/>
+
+<Q-13026 Name="Getserialnumber_MaterialAllotment_DEC" Text="select Serial_number from  item_serial_dtl where item_detail_id not in ( select item_detail_id from user_items where user_id  in ( select user_id from app_user where user_descr =:P_FFAUSER))and quality_status='GOOD' and  item_id IN (SELECT item_id FROM item_master WHERE item_code =:P_item) and current_location = :P_FFALocation   and inventory_status='AVL' order by item_detail_id desc"/>
+
+<Q-13027 Name="Getserialnumber_MaterialAllotment_DEC" Text="select Serial_number from  item_serial_dtl where item_detail_id  in ( select item_detail_id from user_items where user_id  in ( select user_id from app_user where user_descr =:P_FFAUSER))and quality_status='GOOD' and  item_id IN (SELECT item_id FROM item_master WHERE item_code =:P_item) and current_location = :P_FFALocation   and inventory_status='AVL' order by item_detail_id desc"/>
+
+<Q-13028 Name="Getserialnumber_MaterialAllotment_DEC" Text="select Serial_number from  item_serial_dtl where item_detail_id not in ( select item_detail_id from user_items where user_id  in ( select user_id from app_user where user_descr =:P_FFAUSER))and quality_status='GOOD' and  item_id IN (SELECT item_id FROM item_master WHERE item_code =:P_item) and current_location = :P_FFALocation   and inventory_status='AVL' order by item_detail_id desc"/>
+
+<Q-13041 Name="GetMQNNUMBER_ISSUED" Text="Select B.Requisition_Number From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '0' And B.Approval_Status = 'A' And B.Inventory_Location =:P_Location  Order By A.Requisition_Id Desc"/>
+
+<Q-13042 Name="GetISSUENUMBER_MQN" Text="select txn_number from inventory_txn_hdr where source_txn_type = 'MQN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (Select B.Requisition_id From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '0' And B.Approval_Status = 'A' And b.inventory_location =:P_Location) order by txn_id desc"/>
+
+<Q-13043 Name="GetSERIALNUMBER_MQN" Text="Select Serial_Number From Inventory_Txn_Item_Dtl Where carton_id = '0' AND Txn_Item_Id In (Select Txn_Item_Id From Inventory_Txn_Item Where Txn_Id In (Select Txn_Id from inventory_txn_hdr where source_txn_type = 'MQN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (Select B.Requisition_id From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '0' And B.Approval_Status = 'A' And b.inventory_location =:P_Location))) Order By Txn_Item_Id Desc"/>
+
+<Q-13044 Name="GetMQNREC" Text="select txn_number from inventory_txn_hdr where source_txn_type = 'MQN' and txn_type = 'REC' order by txn_id desc"/>
+
+<Q-13045 Name="GetMTNNUMBER_ISSUED" Text="select b.transfer_note_number from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item) and a.approved_qty not like '0' and a.shipped_qty not like '0' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location = 'ELOC' order by a.transfer_note_id desc"/>
+
+<Q-13046 Name="GetSAMESERIALNUMBER_MQN" Text="Select Serial_Number From Inventory_Txn_Item_Dtl Where Txn_Item_Id In (Select Txn_Item_Id From Inventory_Txn_Item Where Txn_Id In (Select Txn_Id From Inventory_Txn_Hdr Where Source_Txn_Type = 'MQN' And Txn_Type  = 'ISS' And Status = 'P' And source_txn_id in (Select B.Requisition_id From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '0' And B.Approval_Status = 'A' And b.inventory_location =:P_Location))) order by txn_item_id desc"/>
+
+<Q-13047 Name="GetMQNNUMBER_REC" Text="Select B.Requisition_Number From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '1' And B.Approval_Status = 'A' And B.Inventory_Location =:P_Location  Order By A.Requisition_Id Desc"/>
+
+<Q-13048 Name="GetISSUENUMBERREC_MQN" Text="select txn_number from inventory_txn_hdr where source_txn_type = 'MQN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (Select B.Requisition_id From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '1' And B.Approval_Status = 'A' And b.inventory_location =:P_Location) order by txn_id desc"/>
+
+<Q-13049 Name="GetSERIALNUMBERREC_MQN" Text="Select Serial_Number From Inventory_Txn_Item_Dtl Where Txn_Item_Id In (Select Txn_Item_Id From Inventory_Txn_Item Where Txn_Id In (Select Txn_Id from inventory_txn_hdr where source_txn_type = 'MQN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (Select B.Requisition_id From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '1' And B.Approval_Status = 'A' And b.inventory_location =:P_Location))) Order By Txn_Item_Id Desc"/>
+
+<Q-13051 Name="GetSerialNumber_MSO_DEC" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'MSO'  order by party_id desc"/>
+
+<Q-13052 Name="Get_CUSTOMERNBR_SERIALNUMBER_MSO_DEC" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where item_id in (select item_id from item_master where item_code ='DEC') and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'MSO') order by customer_id desc"/>
+
+<Q-13053 Name="GetSerialNumber_MSO_SC" Text="Select Serial_Number From Item_Serial_Dtl Where Item_Id In (Select Item_Id From Item_Master Where Item_Code ='SC' )And Quality_Status     ='GOOD' And Inventory_Status   = 'AVL' And Ownership          = 'P' And Source_Txn_Type    = 'MSO' AND Serial_Number NOT IN (SELECT Unique_Id FROM Provsion_Entitlement  )AND SERIAL_NUMBER NOT IN(SELECT SECONDARY_UNIQUE_ID FROM PROVSION_PAIRING_INFO)AND SERIAL_NUMBER NOT IN(SELECT PRIMARY_UNIQUE_ID FROM PROVSION_PAIRING_INFO)Order By Party_Id Desc"/>
+
+<Q-13054 Name="Get_CUSTOMERNBR_EXPIREDSERIALNUMBER_OES" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'OES' and wty_exp_date &lt;= '01-JAN-2019') order by customer_id desc"/>
+
+<Q-13056 Name="GetcustomerNumber_SO_HardWareplan" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLAN111')))) and ownership = 'C') order by customer_id desc"/>
+
+<Q-13057 Name="GetserialNumber_SO_HardWareplan_SetTopBox" Text="select serial_number from item_serial_dtl where serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLAN111')))) and ownership = 'C' order by party_id desc"/>
+
+<Q-13058 Name="GetserialNumber_SO_HardWareplan_SmartCard" Text="select serial_number from item_serial_dtl where party_id in ((select customer_id from service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_desc = 'HWPLN03')) and status1 = 'I')) and item_id in (select item_id from item_master where item_code =: P_item1) order by item_detail_id desc"/>
+
+<Q-13059 Name="GetNewSerialNumber_SmartCard1" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item4) and current_location =:P_Location and quality_status = 'GOOD' and inventory_status = 'AVL' and source_txn_type is null order by 1 desc"/>
+
+<Q-13060 Name="GetcustomerNumber_SO_Baseplan" Text="select customer_nbr from customer_tbl where customer_id in (select customer_id from service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_desc = 'P7')) and status1 = 'I') order by customer_nbr desc"/>
+
+<Q-13061 Name="GetNewSerialNumber_SmartCard" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item1) and current_location =:P_Location and quality_status = 'GOOD' and inventory_status = 'AVL' and source_txn_type is null order by 1 desc"/>
+
+<Q-13062 Name="GET_PROVISIONINGATTRIBUTE" Text="select prov_attribute from item_serial_dtl where quality_status='GOOD' AND current_location =: P_Location AND inventory_status='AVL' AND source_txn_type IS NULL AND prov_attribute IS NOT NULL order by 1 desc"/>
+
+<Q-13063 Name="GET_SUPPLIERCODE" Text="select supplier_code from supplier_tbl where supplier_code = 'CONAX'"/>
+
+<Q-13064 Name="GET_EXISTINGCARTONCODE" Text="select carton_code from carton order by 1 desc"/>
+
+<Q-13065 Name="GET_CUSTOMERNUMBER_ONETIMESALEUPLOAD" Text="select customer_nbr from customer_tbl where customer_id not in (select party_id from merc_sale_order ) order by customer_id desc"/>
+
+<Q-13066 Name="GET_SALEORDERNUMBER_ONETIMESALEUPLOAD" Text="select order_number from merc_sale_order where order_number is not null order by order_id desc"/>
+
+<Q-13067 Name="Get_PRICELESSITEM" Text="select item_code from item_master where item_id not in (select item_id from one_time_sale_charge) order by item_id desc"/>
+
+<Q-13068 Name="Get_InactivePLANCODE" Text="select plan_code from priceplan where status = 'I' order by plan_id desc"/>
+
+<Q-13081 Name="Get_BASIC_SERVICECODE" Text="select service_code from service where service_id in (select service_id from bundle_service where bundle_id in (select bundle_id from priceplan where plan_code = :P_BasicPlan))"/>
+
+<Q-13082 Name="Get_HARDWARE_SERVICECODE" Text="select service_code from service where service_id in (select service_id from bundle_service where bundle_id in (select bundle_id from priceplan where plan_code = :P_HWPlan))"/>
+
+<Q-13083 Name="GetHWPLAN_NONSERIALIZEDITEM_SERVICE" Text="select service_code from service where service_id in (select service_id from bundle_service where bundle_id in (select bundle_id from priceplan where plan_code = :P_BasicPlan))"/>
+
+<Q-13089 Name="GetSaleOrderNbr_Entity_SC" Text="select order_number from merc_sale_order where  order_id in (select Order_id from merc_sale_order_line where item_descr in (select item_descr from item_master where item_code =:P_Item2) and ord_qty > issued_qty) and party_id  = '16' and order_status = 'A' order by order_id desc"/>
+
+<Q-13144 Name="GetSaleOrderNbr_Entity_Penalty" Text="select order_number from merc_sale_order where  order_id in (select Order_id from merc_sale_order_line where item_descr in (select item_descr from item_master where item_code =:P_Item6) and ord_qty > issued_qty) and party_id  = '16' and order_status = 'A' order by order_id desc"/>
+
+<Q-13090 Name="GetRequisitionNo" Text="Select B.Requisition_Number From Mtl_Requisition_Item A , Mtl_Requisition B Where B.Requisition_Id = A.Requisition_Id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code = :P_item)  And A.Shipped_Qty = '0' And A.Received_Qty = '0' And B.Approval_Status = 'A' And B.Inventory_Location =:P_Location  Order By A.Requisition_Id Desc"/>
+
+<Q-13091 Name="GetMTNNUMBER" Text="select b.transfer_note_number from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item) and a.shipped_qty = '0' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location  and b.dest_location =:P_DestLocation order by a.transfer_note_id desc"/>
+
+<Q-13093 Name="GetMTNNUMBER_PENDING_OR_CANCEL" Text="SELECT transfer_note_number FROM mtl_transfer_note WHERE approval_status NOT LIKE 'A' AND  dest_location =:P_DestLocation ORDER BY transfer_note_id DESC"/>
+
+<Q-13092 Name="GetMTNNUMBER_ISSUED" Text="select b.transfer_note_number from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item) and a.approved_qty not like '0' and a.shipped_qty not like '0' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation order by a.transfer_note_id desc"/>
+<Q-13094 Name="GetISSUENUMBER_MTN" Text="select txn_number from inventory_txn_hdr where source_txn_type = 'MTN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (select b.transfer_note_id from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item) and a.approved_qty not like '0' and a.shipped_qty not like '0' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation ) order by txn_id desc"/>
+<Q-13095 Name="GetSERIALNUMBER_MTN" Text="select serial_number from inventory_txn_item_dtl where txn_item_id in (select txn_item_id from inventory_txn_item where txn_id in (select txn_id from inventory_txn_hdr where source_txn_type = 'MTN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (select b.transfer_note_id from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code = :P_item) and a.approved_qty not like '0' and a.shipped_qty not like '0' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation ))) order by txn_item_id desc"/>
+
+<Q-13096 Name="GetRECEIPTNUMBER_MTN" Text="select txn_number from inventory_txn_hdr where source_txn_type = 'MTN' and txn_type = 'REC' order by txn_id desc"/>
+
+<Q-13097 Name="GetMTNNUMBER_NONSERIALIZED" Text="select b.transfer_note_number from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item2) and a.approved_qty not like '0' and a.shipped_qty not like '0' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation  order by a.transfer_note_id desc"/>
+<Q-13098 Name="GetISSUENUMBER_MTN_NONSERIALIZED" Text="select txn_number from inventory_txn_hdr where source_txn_type = 'MTN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (select b.transfer_note_id from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item2) and a.approved_qty not like '0' and a.shipped_qty not like '0' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation) order by txn_id desc"/>
+
+<Q-13099 Name="GetMTNNUMBER_ISSUED" Text="select b.transfer_note_number from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item) and a.approved_qty  like '0' and a.shipped_qty not like '0' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation order by a.transfer_note_id desc"/>
+
+<Q-13101 Name="GetMTNNUMBER_ISSUED_Multiple" Text="select b.transfer_note_number from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item) and a.approved_qty = '2' and a.shipped_qty = '2' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation  order by a.transfer_note_id desc"/>
+<Q-13102 Name="GetISSUENUMBER_MTN_Multiple" Text="select txn_number from inventory_txn_hdr where source_txn_type = 'MTN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (select b.transfer_note_id from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code =:P_item) and a.approved_qty = '2' and a.shipped_qty = '2' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation ) order by txn_id desc"/>
+<Q-13103 Name="GetSERIALNUMBER_MTN_Multiple" Text="select serial_number from inventory_txn_item_dtl where txn_item_id in (select txn_item_id from inventory_txn_item where txn_id in (select txn_id from inventory_txn_hdr where source_txn_type = 'MTN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (select b.transfer_note_id from mtl_transfer_note_item a , mtl_transfer_note b where b.transfer_note_id = a.transfer_note_id and a.item_id in (select item_id from item_master where item_code = :P_item) and a.approved_qty = '2' and a.shipped_qty = '2' and a.received_qty = '0' and b.approval_status = 'A' and b.src_location =:P_Location and b.dest_location =:P_DestLocation ))) order by txn_item_id desc"/>
+
+<Q-13104 Name="Get_SALEORDERNUMBER_ENTITY_CORP" Text="select order_number from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty not like '0' and issued_qty = '0' and item_id in (select item_id from item_master where item_code =:P_item)) and party_id in (select entity_id from operational_entity_tbl where entity_code =:P_ReceivingEntity) and order_status = 'A' order by order_id desc"/>
+<Q-13105 Name="GetISSUENUMBER_SLOC" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and current_location =:P_IssuingLocation and quality_status = 'GOOD' and inventory_status = 'AVL' and source_txn_type is null order by item_detail_id desc"/>
+
+<Q-13106 Name="Get_SALEORDERNUMBER_ENTITY_FINBA" Text="select order_number from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty not like '0' and issued_qty = '0' and item_id in (select item_id from item_master where item_code =:P_item)) and party_id in (select entity_id from operational_entity_tbl where entity_code =:P_IssuingEntity) and order_status = 'A' order by order_id desc"/>
+<Q-13107 Name="GetISSUENUMBER_HLOC" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and current_location =:P_ReceivingLocation and quality_status = 'GOOD' and inventory_status = 'AVL' and source_txn_type is null order by item_detail_id desc"/>
+
+<Q-13108 Name="Get_SALEORDERNUMBER_ENTITY_CORP_MultipleOrders" Text="select order_number from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty = '2' and issued_qty = '0' and item_id in (select item_id from item_master where item_code =:P_item)) and party_id in (select entity_id from operational_entity_tbl where entity_code =:P_ReceivingEntity ) and order_status = 'A' order by order_id desc"/>
+
+<Q-13109 Name="Get_SALEORDERNUMBER_ENTITY_CORP_PENDING" Text="select order_number from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty not like '0' and issued_qty = '0' and item_id in (select item_id from item_master where item_code =:P_item)) and party_id in (select entity_id from operational_entity_tbl where entity_code =:P_ReceivingEntity ) and order_status = 'N' order by order_id desc"/>
+
+<Q-13111 Name="Get_SALEORDERNUMBER_ENTITY_CORP_CANCELED" Text="select order_number from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty not like '0' and issued_qty = '0' and item_id in (select item_id from item_master where item_code =:P_item)) and party_id in (select entity_id from operational_entity_tbl where entity_code =:P_ReceivingEntity ) and order_status = 'C' order by order_id desc"/>
+
+<Q-13110 Name="Get_SALEORDERNUMBER_CORP_forCustomer" Text="select order_number from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty not like '0' and item_id in (select item_id from item_master where item_code =:P_item) and issued_qty = '0') and order_status = 'A' order by party_id desc"/>
+
+<Q-13112 Name="Get_CUSTTOMERNUMBER_MSO" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty not like '0' and item_id in (select item_id from item_master where item_code =:P_item) and issued_qty = '0') and order_status = 'A') order by customer_id desc"/>
+
+<Q-13113 Name="Get_SERVICEORDERNUMBER_CORP_forCustomer" Text="select order_number from service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLAN111')) order by customer_id desc"/>
+
+<Q-13114 Name="Get_CUSTTOMERNUMBER_SO" Text="select customer_nbr from customer_tbl where customer_id in (select customer_id from service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLAN111'))) order by customer_id desc"/>
+<Q-13115 Name="Get_RandomSaleOrderNumber" Text="select order_number from merc_sale_order"/>
+
+<Q-13116 Name="Get_SALEORDERNUMBER_CORP_forCustomer_multiple" Text="select order_number from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty = '2' and item_id in (select item_id from item_master where item_code =:P_item) and issued_qty = '0') and order_status = 'A' order by party_id desc"/>
+
+<Q-13117 Name="Get_CUSTTOMERNUMBER_MSO_multiple" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from merc_sale_order where order_id in (select order_id from merc_sale_order_line where ord_qty = '0' and item_id in (select item_id from item_master where item_code =:P_item) and issued_qty = '0') and order_status = 'A') order by customer_id desc"/>
+
+<Q-13118 Name="GetNewSerialNumber_Smartcard" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item1) and current_location =:P_Location and quality_status = 'GOOD' and inventory_status = 'AVL' and source_txn_type is null"/>
+
+<Q-13119 Name="Get_EXPIREDSERIALNUMBER_MSO" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'MSO' and wty_exp_date &lt;= '01-JAN-2019' order by party_id desc"/>
+
+<Q-13120 Name="Get_CUSTOMERNBR_EXPIREDSERIALNUMBER_MSO" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'MSO' and wty_exp_date &lt;= '01-JAN-2019') order by customer_id desc"/>
+
+<Q-13121 Name="Get_EXPIREDSERIALNUMBER_OES" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'OES' and wty_exp_date &lt;= '01-JAN-2019' order by party_id desc"/>
+
+<Q-13122 Name="Get_CUSTOMERNBR_EXPIREDSERIALNUMBER_OES" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'OES' and wty_exp_date &lt;= '01-JAN-2019') order by customer_id desc"/>
+
+<Q-13123 Name="GetcustomerNumber_SO_HardWareplan" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLAN05')))) and ownership = 'C') order by customer_id desc"/>
+
+<Q-13124 Name="GetserialNumber_SO_HardWareplan_SmartCard" Text="select serial_number from item_serial_dtl where serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLAN05')))) and ownership = 'C' order by party_id desc"/>
+
+<Q-13125 Name="GetSerialNumber_MSO_DEC_FAULTY" Text="select serial_number from item_serial_dtl where quality_status = 'FAULTY' and item_id in (select item_id from item_master where item_code =:P_item) and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'MSO'  order by party_id desc"/>
+
+<Q-13126 Name="Get_CUSTOMERNBR_SERIALNUMBER_MSO_DEC_FAULTY" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl quality_status = 'FAULTY' and where item_id in (select item_id from item_master where item_code =:P_item) and quality_status = 'GOOD' and inventory_status = 'AVL' and ownership = 'P' and source_txn_type = 'MSO') order by customer_id desc"/>
+
+<Q-13127 Name="GETCUSTOMERNUMBER_OPTIONALPLAN_SO_DEC" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where  serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLNOPT')))) and ownership = 'C') order by customer_id desc"/>
+
+<Q-13128 Name="GETSERIALNUMBER_OPTIONALPLAN_SO_DEC" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and  serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLNOPT')))) and ownership = 'C' order by party_id desc"/>
+
+<Q-13129 Name="GETSERIALNUMBER_OPTIONALPLAN_SO_SC" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item1) and  serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLNOPT')))) and ownership = 'C' order by party_id desc"/>
+
+<Q-13131 Name="GetSerialNumber_OwnedHardware" Text="select serial_number from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and mrn_id = '0' and external = 'Y' order by party_id desc"/>
+
+<Q-13132 Name="GetCustomerNumber_OwnedHardware" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where item_id in (select item_id from item_master where item_code =:P_item) and mrn_id = '0' and external = 'Y') order by customer_id desc"/>
+
+<Q-13133 Name="Get_CUSTOMERNBR_MSO_CABLE" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from merc_sale_order where order_id in (select order_id from merc_sale_order_line where item_id in (select item_id from item_master where item_code =:P_item2) and ord_qty = issued_qty)) order by customer_id desc"/>
+
+<Q-13134 Name="GetEntityCode_HoldInventory_NO" Text="select entity_code from operational_entity_tbl where  hold_inventory = 'N' order by entity_id desc"/>
+
+<Q-13135 Name="GetHWPLAN_INACTIVE" Text="select PLAN_CODE from priceplan  where category = 'HWP' and status = 'I' order by plan_id desc"/>
+
+<Q-13136 Name="GetSaleOrderNbr_PastDATE_Entity" Text="select order_number from merc_sale_order where  order_id in (select Order_id from merc_sale_order_line where item_descr in (select item_descr from item_master where item_code =:P_item) and ord_qty > issued_qty) and party_id  = '16' and order_status = 'A' and order_date &lt;= '01-JAN-2019' order by order_id desc"/>
+
+<Q-13137 Name="GetSaleOrderNbr_MULTIPLEITEMS_Entity" Text="select order_number from merc_sale_order where  order_id in (select Order_id from merc_sale_order_line where item_descr in (select item_descr from item_master where item_code in (P_item,P_item1)) and ord_qty > issued_qty) and party_id  = '16' and order_status = 'A' and order_date &lt;= '01-JAN-2019' order by order_id desc"/>
+
+<Q-13138 Name="GetMQNNUMBER_REC" Text="Select B.Requisition_Number From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item2) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '0' And B.Approval_Status = 'A' And B.Inventory_Location =:P_Location  Order By A.Requisition_Id Desc"/>
+
+<Q-13139 Name="GetISSUENUMBERREC_MQN" Text="select txn_number from inventory_txn_hdr where source_txn_type = 'MQN' and txn_type  = 'ISS' and status = 'P' and source_txn_id in (Select B.Requisition_id From Mtl_Requisition_Item A , Mtl_Requisition B Where B.requisition_id = A.requisition_id And A.Item_Id In (Select Item_Id From Item_Master Where Item_Code =:P_item2) And A.Approved_Qty Not Like '0' And A.Shipped_Qty Not Like '0' And A.Received_Qty = '0' And B.Approval_Status = 'A' And b.inventory_location =:P_Location) order by txn_id desc"/>
+
+<Q-13140 Name="GetcustomerNumber_SO_HardWareplan_optionalplan" Text="select customer_nbr from customer_tbl where customer_id in (select party_id from item_serial_dtl where serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLNOP')))) and ownership = 'C') order by customer_id desc"/>
+
+<Q-13141 Name="GetserialNumber_SO_HardWareplan_SetTopBox" Text="select serial_number from item_serial_dtl where serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLNOP')))) and ownership = 'C' and item_id = '19' order by party_id desc"/>
+
+<Q-13142 Name="GetserialNumber_SO_HardWareplan_smartcard" Text="select serial_number from item_serial_dtl where serial_number in (select serial_number from serviceorder_hw_details where order_id in (select order_id from  service_order where contract_id in (select contract_id from contract_priceline where plan_id in (select plan_id from priceplan where plan_code = 'HWPLNOP')))) and ownership = 'C' and item_id = '16' order by party_id desc"/>
+
+<Q-13143 Name="Get_ONE_TIMESAELE_ORDER(Document)No" Text="select b.ORDER_NUMBER from Customer_Tbl a, merc_sale_order b, Merc_Sale_Order_Line c Where A.Customer_Id=B.Party_Id And B.Order_Id=C.Order_Id And C.Item_Descr='Set Top Box'  And C.Ord_Qty > C.Issued_Qty And B.Order_Date Between '07-FEB-18' and '31-MAY-20'order by Customer_Id desc"/>
+
+</Module>
+
+  <Module Name="Mediation">
+    <Q-14001 Name="" Text=""/>
+  </Module>
+  <Module Name="OrderManagement">
+<Q-10031 Name="GetcustrnumDetails" Text="select customer_nbr from (select customer_nbr from customer_tbl where status='N' order by customer_id desc) where rownum =1"/>
+<Q-10032 Name="GetcustforOrderUp" Text="select customer_nbr from (select customer_nbr from customer_tbl where status='N' and OPENTITY_ID=14 order by customer_id desc) where rownum =1"/>
+<Q-10033 Name="GetCusttypeforOrderUp" Text="select customer_nbr from (select customer_nbr from customer_tbl where status='N' and CUSTOMER_TYPE='PROSPECT' order by customer_id desc) where rownum =1"/>
+<Q-15001 Name="ToGetNewCustomerNumber" Text="select customer_nbr from customer_tbl where customer_id in (SELECT party_id from party where is_multiroom = 'N') and customer_id not in (select customer_id from service_order) order by customer_id desc"/>
+    <Q-15002 Name="Get_BASIC_SERVICECODE" Text="select service_code from service where service_id in (select service_id from bundle_service where bundle_id in (select bundle_id from priceplan where plan_code =:P_BasicPlan))"/>
+<Q-15003 Name="Get_DISCONNECTED_CUSTOMER" Text="select party_nbr from party where party_id in (select customer_id from contract where status = 'D') and is_multiroom = 'N' order by party_id desc"/>
+ <Q-15004 Name="Get_DISCONNECTED_CONTRACTNUMBER" Text="select contract_number from contract where status = 'D' and customer_id  in (select party_id from party where is_multiroom  = 'N') order by customer_id desc"/>
+    <Q-15005 Name="Get_DISCONNECTED_CONNCTIONNUMBER" Text="select connection_number from connection_header where customer_id in (select customer_id from contract where status = 'D') and customer_id  in (select party_id from party where is_multiroom  = 'N') order by customer_id desc"/>	
+
+    <Q-15006 Name="Get_RECONNECTED_CUSTOMER" Text="select party_nbr from party where party_id in (select customer_id from service_order where order_type = 'REC') and is_multiroom = 'N' order by party_id desc"/>
+    <Q-15007 Name="Get_RECONNECTED_CONTRACTNUMBER" Text="select contract_number from contract where status = 'A' and customer_id  in (select party_id from party where party_id in (select customer_id from service_order where order_type = 'REC') and is_multiroom = 'N') order by customer_id desc"/>
+    <Q-15008 Name="Get_RECONNECTED_CONNCTIONNUMBER" Text="select connection_number from connection_header where customer_id in (select party_id from party where party_id in (select customer_id from service_order where order_type = 'REC') and is_multiroom = 'N') order by customer_id desc"/>	
+
+    <Q-15009 Name="Get_RECONNECTED_STAGING_CUSTOMER" Text="select party_nbr from party where party_id in (select customer_id from service_order where order_type = 'REC' AND STATUS1  =  'B') and is_multiroom = 'N' order by party_id desc"/>
+    <Q-15010 Name="Get_RECONNECTED_STAGING_CONTRACTNUMBER" Text="select contract_number from contract where status = 'A' and customer_id  in (select party_id from party where party_id in (select customer_id from service_order where order_type = 'REC' and status1 = 'B') and is_multiroom = 'N') order by customer_id desc"/>
+    <Q-15011 Name="Get_RECONNECTED_STAGING_CONNCTIONNUMBER" Text="select connection_number from connection_header where customer_id in (select party_id from party where party_id in (select customer_id from service_order where order_type = 'REC' and status1 = 'B') and is_multiroom = 'N') order by customer_id desc"/>
+
+    <Q-15015 Name="Get_SO_CUSTOMER" Text="select party_nbr from party where party_id in (select customer_id from contract where status = 'A') and is_multiroom = 'N' order by party_id desc"/>
+    <Q-15014 Name="Get_SO_CONTRACTNUMBER" Text="select contract_number from contract where customer_id in(select party_id from party where party_id in (select customer_id from contract where status = 'A') and is_multiroom = 'N') order by customer_id desc"/>
+
+    <Q-15020 Name="Get_FIXEDTERM_CONTRACTNUMBER" Text="select contract_number from contract where contract_period not like '0' and status = 'A'  order by customer_id desc"/>
+<Q-15021 Name="Trail_customer" Text="select customer_nbr from customer_tbl where customer_id in (select customer_id from service_order where contract_type='FREETRIAL') order by customer_id desc"/>
+<Q-15021 name="Get_freemiumcustomer" Text="select customer_nbr from customer_tbl where customer_id in (select customer_id from contract where status='A' and customer_id in (select customer_id from service_order where contract_type='STD' and order_type='NEW' and is_prepaid_contract='N'))order by customer_id desc"/>
+<Q-15022 Name="Get_premiumcustomer" Text="select customer_nbr from customer_tbl where customer_id in (select customer_id from contract where status='A' and customer_id in (select customer_id from service_order where contract_type='STD' and order_type='NEW' and is_prepaid_contract='Y'))order by customer_id desc"/>
+<Q-15023 Name="Disconnected Customer" Text="select customer_nbr from customer_tbl where customer_id in (select customer_id from contract where is_prepaid_contract='N' and contract_TYPE='STD'and status='D') order by customer_id desc"/>
+  </Module>
+  <Module Name="Provisioning">
+    <Q-16001 Name="" Text=""/>
+  </Module>
+</Queries>
